@@ -79,28 +79,123 @@ summary{cursor:pointer;font-weight:600}
 <script>
 
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
-const C=[['oil1','Fortune Sunflower Oil 1L pouch',['fortune'],['oil','tel','sunflower','refined'],'1l',135,12],
-['oil5','Fortune Sunflower Oil 5L tin',['fortune'],['oil','tel','sunflower','refined'],'5l',690,4,1],
-['saf','Saffola Gold Oil 1L',['saffola'],['oil','tel'],'1l',185,12],
-['sar','Dhara Kachi Ghani Mustard Oil 1L',['dhara'],['oil','tel','sarson','mustard','kachi','ghani'],'1l',165,12],
-['salt','Tata Salt 1kg',['tata'],['salt','namak'],'1kg',28,25],
-['tea','Tata Tea Red Label 250g',['tata','red','label'],['tea','chai','patti'],'250g',135,24],
-['atta5','Aashirvaad Atta 5kg',['aashirvaad','ashirvad','aashirwad','ashirwad'],['atta','aata'],'5kg',265,4],
-['atta10','Aashirvaad Atta 10kg',['aashirvaad','ashirvad','aashirwad','ashirwad'],['atta','aata'],'10kg',520,2],
-['maggi','Maggi 2-Minute Noodles 70g',['maggi'],['noodles'],'70g',14,48],
-['parle','Parle-G Biscuit 56g',['parle','g'],['biscuit'],'56g',5,120],
-['goodday','Britannia Good Day Cookies 100g',['good','day','britannia'],['biscuit','cookies'],'100g',10,72],
-['surf1','Surf Excel Easy Wash 1kg',['surf','excel'],['detergent','powder'],'1kg',130,12],
-['surf5','Surf Excel Easy Wash 500g',['surf','excel'],['detergent','powder'],'500g',68,24],
-['colgate','Colgate Strong Teeth 200g',['colgate'],['paste','toothpaste'],'200g',110,48],
-['lifebuoy','Lifebuoy Total Soap 100g',['lifebuoy'],['soap','sabun'],'100g',32,72],
-['butter100','Amul Butter 100g',['amul'],['butter','makhan'],'100g',58,40],
-['butter500','Amul Butter 500g',['amul'],['butter','makhan'],'500g',285,20],
-['sugar','Sugar 5kg bag',[],['sugar','chini','cheeni'],'5kg',230,6],
-['toor','Toor Dal 1kg',[],['toor','dal','tuvar','arhar'],'1kg',165,10]].map(a=>({id:a[0],name:a[1],B:a[2],F:a[3],size:a[4],price:a[5],case:a[6],tin:!!a[7]}));
-const byId=Object.fromEntries(C.map(c=>[c.id,c]));
+const CSV=`id|brand|product|size|mrp|case|cat|extra
+oil1|Fortune|Sunflower Oil|1L|135|12|oil|
+oil5|Fortune|Sunflower Oil|5L|690|4|oil|*
+saf|Saffola|Gold Oil|1L|185|12|oil|
+sar|Dhara|Kachi Ghani Mustard Oil|1L|165|12|oil|sarson sarso
+-|Sundrop|Heart Oil|1L|180|12|oil|
+-|Gemini|Sunflower Oil|1L|140|12|oil|
+-|Patanjali|Mustard Oil|1L|170|12|oil|sarson
+-|Freedom|Refined Sunflower Oil|1L|135|12|oil|
+-|Nature Fresh|Groundnut Oil|1L|215|12|oil|moongfali
+-|Emami|Rice Bran Oil|1L|150|12|oil|
+-|Amul|Ghee|1L|680|12|ghee|
+-|Patanjali|Cow Ghee|1L|640|12|ghee|
+-|Amul|Taaza Milk|1L|68|12|milk|
+-|Nestle|Milkmaid|400g|150|24|milk|
+butter100|Amul|Butter|100g|58|40|butter|
+butter500|Amul|Butter|500g|285|20|butter|
+-|Mother Dairy|Butter|100g|58|40|butter|
+-|Amul|Cheese Slices|200g|140|24|cheese|
+atta5|Aashirvaad|Atta|5kg|265|4|atta|ashirvad aashirwad ashirwad
+atta10|Aashirvaad|Atta|10kg|520|2|atta|ashirvad aashirwad ashirwad
+-|Pillsbury|Chakki Atta|5kg|250|4|atta|
+-|Fortune|Chakki Fresh Atta|5kg|255|4|atta|
+-|Rajdhani|Besan|500g|60|20|atta|
+-|Patanjali|Maida|1kg|45|20|atta|
+-|India Gate|Basmati Rice|5kg|650|4|rice|
+-|Daawat|Basmati Rice|5kg|600|4|rice|
+-|Kohinoor|Basmati Rice|5kg|620|4|rice|
+-|Lal Qilla|Basmati Rice|5kg|580|4|rice|
+sugar|Madhur|Sugar|5kg|230|6|sugar|
+-|Madhur|Sugar|1kg|48|25|sugar|
+salt|Tata|Salt|1kg|28|25|salt|
+-|Aashirvaad|Iodised Salt|1kg|26|25|salt|
+toor|Sampann|Toor Dal|1kg|165|10|dal|tuvar arhar
+-|Sampann|Chana Dal|1kg|140|10|dal|
+-|Sampann|Moong Dal|1kg|150|10|dal|
+-|Sampann|Masoor Dal|1kg|120|10|dal|
+-|Sampann|Urad Dal|1kg|155|10|dal|
+-|Nutrela|Soya Chunks|220g|50|24|soya|
+-|MDH|Garam Masala|100g|85|48|spice|
+-|MDH|Chana Masala|100g|80|48|spice|
+-|MDH|Chaat Masala|100g|78|48|spice|
+-|Everest|Turmeric Powder|200g|75|48|spice|haldi
+-|Everest|Red Chilli Powder|200g|95|48|spice|mirchi lal
+-|Everest|Coriander Powder|200g|60|48|spice|dhania
+-|Everest|Kitchen King Masala|100g|85|48|spice|
+-|Everest|Pav Bhaji Masala|100g|78|48|spice|
+-|Catch|Cumin Seeds|100g|70|48|spice|jeera
+tea|Tata|Tea Red Label|250g|135|24|tea|red label
+-|Tata|Tea Gold|250g|160|24|tea|
+-|Taj Mahal|Tea|250g|170|24|tea|
+-|Wagh Bakri|Tea|250g|140|24|tea|
+-|Nescafe|Classic Coffee|50g|175|24|coffee|
+-|Bru|Instant Coffee|50g|160|24|coffee|
+-|Horlicks|Classic Malt|500g|245|12|health|
+-|Cadbury|Bournvita|500g|245|12|health|
+-|Boost|Health Drink|500g|250|12|health|
+parle|Parle-G|Biscuit|56g|5|120|biscuit|
+goodday|Britannia|Good Day Cookies|100g|10|72|biscuit|
+-|Britannia|Marie Gold|250g|40|36|biscuit|
+-|Parle|Monaco Biscuit|75g|20|48|biscuit|
+-|Sunfeast|Dark Fantasy|100g|40|48|biscuit|
+-|Oreo|Biscuit|120g|40|48|biscuit|
+-|Britannia|Bourbon|100g|30|48|biscuit|
+-|Lays|Classic Salted Chips|52g|20|60|snack|
+-|Kurkure|Masala Munch|90g|20|60|snack|
+-|Haldiram|Aloo Bhujia|200g|55|30|snack|
+-|Haldiram|Moong Dal Namkeen|200g|55|30|snack|
+maggi|Maggi|2-Minute Noodles|70g|14|48|noodle|
+-|Yippee|Noodles|70g|14|48|noodle|
+-|Top Ramen|Curry Noodles|70g|14|48|noodle|
+-|Kissan|Tomato Ketchup|500g|110|24|sauce|
+-|Kissan|Mixed Fruit Jam|500g|165|24|jam|
+-|Priya|Mango Pickle|500g|140|24|pickle|
+-|Coca-Cola|Soft Drink|750ml|40|24|drink|coke
+-|Pepsi|Soft Drink|750ml|40|24|drink|
+-|Thums Up|Soft Drink|750ml|40|24|drink|
+-|Sprite|Soft Drink|750ml|40|24|drink|
+-|Real|Fruit Juice|1L|120|12|drink|
+-|Bisleri|Packaged Water|1L|20|12|water|
+lifebuoy|Lifebuoy|Total Soap|100g|32|72|soap|
+-|Lux|Soft Touch Soap|100g|40|72|soap|
+-|Dettol|Original Soap|125g|50|72|soap|
+-|Santoor|Sandal Soap|100g|40|72|soap|
+-|Pears|Pure Soap|125g|70|72|soap|
+-|Medimix|Ayurvedic Soap|125g|45|72|soap|
+-|Hamam|Soap|100g|35|72|soap|
+surf1|Surf Excel|Easy Wash|1kg|130|12|detergent|
+surf5|Surf Excel|Easy Wash|500g|68|24|detergent|
+-|Tide|Plus Detergent Powder|1kg|120|12|detergent|
+-|Ariel|Matic Detergent Powder|1kg|230|12|detergent|
+-|Wheel|Active Detergent Powder|1kg|75|12|detergent|
+-|Rin|Detergent Bar|250g|20|60|detergent|
+-|Vim|Dishwash Bar|300g|30|36|dish|
+-|Vim|Dishwash Gel|500ml|110|24|dish|
+-|Harpic|Toilet Cleaner|500ml|95|24|cleaner|
+-|Lizol|Floor Cleaner|500ml|105|24|cleaner|
+-|Colin|Glass Cleaner|500ml|95|24|cleaner|
+colgate|Colgate|Strong Teeth|200g|110|48|paste|
+-|Pepsodent|Germicheck Paste|200g|100|48|paste|
+-|Close Up|Red Hot Paste|150g|95|48|paste|
+-|Dabur|Red Paste|200g|105|48|paste|
+-|Patanjali|Dant Kanti|200g|100|48|paste|
+-|Clinic Plus|Shampoo|175ml|110|24|hair|
+-|Sunsilk|Shampoo|180ml|120|24|hair|
+-|Parachute|Coconut Oil|500ml|210|24|hairoil|
+`;
+let C=[],byId={};
+const CAT={oil:'oil tel',atta:'atta aata flour',rice:'rice chawal',dal:'dal',sugar:'sugar chini cheeni',salt:'salt namak',spice:'masala',tea:'tea chai patti',coffee:'coffee',health:'health drink',biscuit:'biscuit',snack:'snacks namkeen',noodle:'noodles',sauce:'sauce',jam:'jam',pickle:'pickle achar',drink:'drink',water:'water paani',soap:'soap sabun',detergent:'detergent powder washing',dish:'dishwash bartan',cleaner:'cleaner',paste:'paste toothpaste',hair:'hair shampoo',hairoil:'hair tel',ghee:'ghee',butter:'butter makhan',milk:'milk doodh',cheese:'cheese',soya:'soya'};
+const tk=s=>s.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+function build(txt){const rows=txt.trim().split('\n').slice(1).map(r=>r.split('|')).filter(r=>r.length>=7);
+ C=rows.map((r,i)=>{const[id,brand,prod,size,mrp,cs,cat,ex='']=r.map(x=>x.trim());const tin=ex.startsWith('*');
+  return{id:id==='-'?'x'+i:id,brand,name:`${brand} ${prod} ${size}`,B:[...new Set([...tk(brand),...tk(ex)])],F:[...new Set([...tk(CAT[cat]||cat),...tk(prod)])],size:size.toLowerCase(),price:+mrp,case:+cs,tin}});
+ byId=Object.fromEntries(C.map(c=>[c.id,c]))}
+build(CSV);
 function lev(a,b){const m=[];for(let i=0;i<=a.length;i++)m[i]=[i];for(let j=1;j<=b.length;j++)m[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]==b[j-1]?0:1));return m[a.length][b.length]}
-const hit=(q,w)=>q==w||(q.length>=4&&w.length>=4&&lev(q,w)<=(q.length>=7?2:1));
+const hit=(q,w)=>q==w||(q.length>=4&&w.length>=4&&lev(q,w)<=(q.length>=8?2:1));
 const NW={ek:1,do:2,teen:3,char:4,chaar:4,paanch:5,panch:5,chhe:6,saat:7,aath:8,nau:9,das:10,bees:20,aadha:.5,half:.5};
 const U={peti:'case',petti:'case',carton:'case',case:'case',box:'case',dabba:'tin',dabbe:'tin',tin:'tin',jar:'tin',packet:'pcs',packets:'pcs',pkt:'pcs',pack:'pcs',pc:'pcs',pcs:'pcs',piece:'pcs',bag:'pcs',bori:'pcs',nos:'pcs',dozen:'dozen',darjan:'dozen',dzn:'dozen',kg:'kg',kilo:'kg',g:'g',gm:'g',gram:'g',l:'l',ltr:'l',litre:'l',liter:'l'};
 const STOP=new Set('bhaiya bhai bhej bhejna dena de dijiye chahiye please pls ka ki ke ko wala wali wale hai hello namaste mujhe order kal tak the for sir ji aap hi bas'.split(' '));
@@ -124,7 +219,7 @@ function resolve(p){
  if(!sc.length){l.missing=true;return l}
  const top=sc[0],tied=sc.filter(x=>x.s>=top.s-.01);
  if(!tied.some(x=>x.b)&&top.un>0){l.missing=true;l.sugg=top.it;return l}
- if(tied.length===1)l.item=top.it;else l.options=tied.slice(0,4).map(x=>x.it);
+ l.p=p;if(tied.length===1)l.item=top.it;else{const br=[...new Set(tied.map(x=>x.it.brand))];if(tied.length>6&&br.length>1){l.options=[];l.brands=br.slice(0,8)}else l.options=tied.slice(0,6).map(x=>x.it)}
  return l}
 const pcs=l=>l.qty==null?0:Math.round(l.unit==='case'?l.qty*l.item.case:l.unit==='dozen'?l.qty*12:l.qty);
 function splitMsg(m){return m.toLowerCase().split(/\s*(?:[,;\n+]|\baur\b|\band\b|\bphir\b)\s*/).filter(x=>x.trim())}
@@ -170,7 +265,7 @@ function sane(l){if(!l.item||l.qty==null)return null;const p=pcs(l),t=typ(S.stor
  return p>lim?`${l.qty} ${UL[l.unit]} = ${p.toLocaleString('en-IN')} pcs (${fmt(p*l.item.price)}). ${t?'Aap aam taur par '+t+' pcs mangate hain.':'Yeh bahut zyada lagta hai.'} Kya yeh sahi hai?`:null}
 const st=l=>l.missing?'missing':!l.item?'variant':l.qty==null?'qty':(sane(l)&&!l.ack)?'warn':'ok';
 function nudges(){const k=S.store,have=new Set();S.lines.forEach(l=>{if(l.item)have.add(l.item.id);(l.options||[]).forEach(o=>have.add(o.id));if(l.sugg)have.add(l.sugg.id)});
- return Object.keys(P[k].h).filter(id=>!have.has(id)&&!S.skip[k+id]).map(id=>({id,s:ewma(k,id,36)})).filter(x=>x.s>=S.th).sort((a,b)=>b.s-a.s).slice(0,2)}
+ return Object.keys(P[k].h).filter(id=>byId[id]&&!have.has(id)&&!S.skip[k+id]).map(id=>({id,s:ewma(k,id,36)})).filter(x=>x.s>=S.th).sort((a,b)=>b.s-a.s).slice(0,2)}
 const total=ls=>ls.reduce((a,l)=>a+(l.item&&l.qty!=null?pcs(l)*l.item.price:0),0);
 function card(ro,ls){ls=ls||S.lines;
  let h=`<div class="ch"><b>${ro?'✅ Confirmed order':'Aapka order'}</b><span class="mut sm">${ls.length} item</span></div>`;
@@ -187,7 +282,7 @@ function card(ro,ls){ls=ls||S.lines;
     h+=`<div class="ask w">⚠ ${esc(sn)}<div class="chips"><button class="chip" data-act="ack" data-i="${i}">Haan, sahi hai</button><button class="chip" data-act="fix" data-i="${i}" data-v="${fq}">${fq} ${UL[l.unit]} kar do</button></div></div>`}
    h+='</div>'}
   else if(l.missing){h+=`<div class="ln"><div class="r1"><span>“${esc(l.raw)}”</span></div><div class="ask e">❌ Yeh item hamare catalog mein nahi hai, isliye order mein nahi joda.${l.sugg?` <b>${esc(l.sugg.name)}</b> chalega?`:''}<div class="chips">${l.sugg?`<button class="chip" data-act="sugg" data-i="${i}">Haan, yeh lagao</button>`:''}<button class="chip g" data-act="rm" data-i="${i}">Rehne do</button></div></div></div>`}
-  else h+=`<div class="ln"><div class="r1"><span>“${esc(l.raw)}”</span></div><div class="ask">Kaun sa lena hai?<div class="chips">${l.options.map(o=>`<button class="chip" data-act="pick" data-i="${i}" data-id="${o.id}">${esc(o.name)} · ${fmt(o.price)}</button>`).join('')}</div></div></div>`});
+  else h+=`<div class="ln"><div class="r1"><span>“${esc(l.raw)}”</span></div><div class="ask">${l.brands?'Kaun sa brand?':'Kaun sa lena hai?'}<div class="chips">${(l.brands||[]).map(b=>`<button class="chip" data-act="brand" data-i="${i}" data-b="${esc(b)}">${esc(b)}</button>`).join('')}${l.options.map(o=>`<button class="chip" data-act="pick" data-i="${i}" data-id="${o.id}">${esc(o.name)} · ${fmt(o.price)}</button>`).join('')}</div></div></div>`});
  const t=total(ls);h+=`<div class="tot"><span>Total</span><b>${fmt(t)}</b></div>`;
  if(!ro){const p=ls.filter(l=>st(l)!=='ok').length;h+=`<button class="cta" data-act="review" ${p||!t?'disabled':''}>${p?`Pehle ${p} sawal ka jawab dein`:`Order check karein · ${fmt(t)}`}</button><button class="sec" data-act="newo" style="width:100%">Naya order shuru karein</button>`}
  return h}
@@ -241,6 +336,7 @@ $('.phone').addEventListener('click',e=>{const b=e.target.closest('button[data-a
  else if(a==='skipn')S.skip[S.store+b.dataset.id]=1;
  else if(a==='review')S.sheet=true;
  else if(a==='back')S.sheet=false;
+ else if(a==='brand'){const p=l.p;p.words=[...p.words,...tk(b.dataset.b)];const f=l.fresh;Object.assign(l,{brands:null,options:null,item:null,missing:false,sugg:null},resolve(p),{fresh:f});dedupe()}
  else if(a==='newo'){S.lines=[];S.sheet=false;S.chat=S.chat.filter(m=>m.t!=='order');S.chat.push({t:'bot',text:'Draft hata diya 🗑 Naya order likhiye.',time:tm()})}
  else if(a==='confirm')return confirmOrder();
  render()});
@@ -251,5 +347,5 @@ $('#store').onchange=e=>{S.store=e.target.value;greet()};
 $('#sc').innerHTML=SC.map((s,i)=>`<button data-sc="${i}">${s[0]}<small>${s[2]}</small></button>`).join('');
 $('#sc').onclick=e=>{const b=e.target.closest('button');if(!b)return;const s=SC[b.dataset.sc];S.store=s[1];$('#store').value=s[1];greet();send(s[3])};
 $('#reset').onclick=greet;
-bindEv();greet();
+(async()=>{try{const r=await fetch('catalog.csv');if(r.ok){const t=await r.text();if(t.startsWith('id|')){build(t)}}}catch(e){}bindEv();greet()})();
 </script></body></html>
