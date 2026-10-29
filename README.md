@@ -25,3 +25,7 @@ Local test: `npm i -g vercel && vercel dev` with a `.env` file copied from `.env
 - Keep the test gold labels updated. The row "1 peti maggi ya 2 peti parle g" expects a follow-up, so a parser that correctly splits it into two lines is scored wrong by that row.
 
 Never commit `.env` or paste the key into index.html.
+
+## Invoice
+After the shopkeeper confirms, the bot offers "Invoice dekhein". The invoice can be printed or saved as PDF, downloaded as HTML, or shared as text on WhatsApp.
+Update `SELLER` in index.html with the distributor's real name and GSTIN. To show a GST split, add a 9th column `gst` (e.g. 5, 12, 18) to every row in catalog.csv; without it the invoice says prices are MRP-inclusive and GST is not itemised. Real HSN codes and rates must come from the distributor's accountant.
