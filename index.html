@@ -43,7 +43,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 .nudge b{display:inline}.tag{font-style:normal;font-size:12px;background:var(--okbg);color:var(--ok);border-radius:99px;padding:0 8px;margin-right:6px}
 .cm{display:flex;gap:8px;padding:8px;background:var(--chat)}
 .cm input{flex:1;min-width:0;border:0;border-radius:99px;padding:10px 14px;background:var(--inp);color:var(--ink);font:inherit}
-.snd{width:44px;height:44px;border-radius:50%;border:0;background:var(--hd);color:var(--hdt);font-size:18px}
+.r{text-align:right}.snd{width:44px;height:44px;border-radius:50%;border:0;background:var(--hd);color:var(--hdt);font-size:18px}
 #sheet{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end}#sheet[hidden]{display:none}
 #sheet>div{background:var(--bot);width:100%;border-radius:18px 18px 0 0;padding:16px;max-height:92%;overflow:auto}
 #sheet h3{margin:0 0 6px}#sheet .btns{display:flex;gap:8px}#sheet .btns button{flex:1}
@@ -190,8 +190,8 @@ let C=[],byId={};
 const CAT={oil:'oil tel',atta:'atta aata flour',rice:'rice chawal',dal:'dal',sugar:'sugar chini cheeni',salt:'salt namak',spice:'masala',tea:'tea chai patti',coffee:'coffee',health:'health drink',biscuit:'biscuit',snack:'snacks namkeen',noodle:'noodles',sauce:'sauce',jam:'jam',pickle:'pickle achar',drink:'drink',water:'water paani',soap:'soap sabun',detergent:'detergent powder washing',dish:'dishwash bartan',cleaner:'cleaner',paste:'paste toothpaste',hair:'hair shampoo',hairoil:'hair tel',ghee:'ghee',butter:'butter makhan',milk:'milk doodh',cheese:'cheese',soya:'soya'};
 const tk=s=>s.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
 function build(txt){const rows=txt.trim().split('\n').slice(1).map(r=>r.split('|')).filter(r=>r.length>=7);
- C=rows.map((r,i)=>{const[id,brand,prod,size,mrp,cs,cat,ex='']=r.map(x=>x.trim());const tin=ex.startsWith('*');
-  return{id:id==='-'?'x'+i:id,brand,name:`${brand} ${prod} ${size}`,B:[...new Set([...tk(brand),...tk(ex)])],F:[...new Set([...tk(CAT[cat]||cat),...tk(prod)])],size:size.toLowerCase(),price:+mrp,case:+cs,tin}});
+ C=rows.map((r,i)=>{const[id,brand,prod,size,mrp,cs,cat,ex='',gst='']=r.map(x=>x.trim());const tin=ex.startsWith('*');
+  return{id:id==='-'?'x'+i:id,brand,name:`${brand} ${prod} ${size}`,B:[...new Set([...tk(brand),...tk(ex)])],F:[...new Set([...tk(CAT[cat]||cat),...tk(prod)])],size:size.toLowerCase(),price:+mrp,case:+cs,tin,gst:gst!==''?+gst:null}});
  byId=Object.fromEntries(C.map(c=>[c.id,c]))}
 build(CSV);
 function lev(a,b){const m=[];for(let i=0;i<=a.length;i++)m[i]=[i];for(let j=1;j<=b.length;j++)m[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]==b[j-1]?0:1));return m[a.length][b.length]}
@@ -257,7 +257,7 @@ function evalHtml(){const T=runTests(),pct=x=>Math.round(x*100)+'%';
  <div class="scroll"><table><tr><th></th><th>Precision</th><th>Recall</th><th>Cost on test set</th></tr><tr><td>Baseline (last order)</td><td>${pct(b.p)}</td><td>${pct(b.r)}</td><td>${fmt(b.cost)}</td></tr><tr><td><b>Model (EWMA ≥ ${S.th})</b></td><td>${pct(m.p)}</td><td>${pct(m.r)}</td><td>${fmt(m.cost)}</td></tr></table></div>
  <p class="note">Costs are assumptions: a missed item means a lost sale or an extra delivery trip; a useless nudge costs a little attention and, if frequent, trust. History is <b>synthetic</b> and generated from fixed habits, so the model partly learns the generator. Real data would show lower scores. Replace before going live.</p>`}
 function bindEv(){$('#ev').innerHTML=evalHtml();$('#llmbtn').onclick=llmEval;$('#llmres').innerHTML=S.llmh||'';$('#th').oninput=e=>{S.th=+e.target.value;bindEv();render()};$('#cfn').onchange=e=>{S.cFN=+e.target.value;bindEv()};$('#cfp').onchange=e=>{S.cFP=+e.target.value;bindEv()}}
-const S={store:'sharma',lines:[],skip:{},chat:[],typing:false,sheet:false,th:.55,cFP:5,cFN:150,n:1041,last:'–',len:0,engine:'not used yet',llmh:''};
+const S={store:'sharma',lines:[],skip:{},chat:[],typing:false,sheet:false,th:.55,cFP:5,cFN:150,n:1041,last:'–',len:0,engine:'not used yet',invoices:{},invView:null,llmh:''};
 const tm=()=>new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
 const UL={case:'peti',pcs:'pcs',dozen:'dozen',tin:'dabba'};
 const SC=[['Clean order','sharma','Sab items samajh aate hain','2 peti maggi, 1 peti parle g, 3 peti fortune oil 1l, 1 peti tata salt, 2 pkt red label'],['Needs a follow-up','sharma','Do cheezon mein size poochta hai','bhaiya 2 peti fortune tel aur surf 3 packet bhej do'],['Reorder nudge','sharma','Usual item missing hai','2 peti maggi aur 1 peti parle g aur 5 pkt red label'],['Edge cases','sharma','Catalog mein nahi + bahut bada quantity','1 peti maggi, 2 peti dove soap, 50 peti parle g, nutella 3 jar']];
@@ -297,7 +297,7 @@ function render(){const c=$('#chat'),top=c.scrollTop;let h='';
    nudges().forEach(n=>{const it=byId[n.id],t=typ(S.store,n.id);h+=`<div class="b nudge">💡 Aapne is baar <b>${esc(it.name)}</b> order nahi kiya, bhej dein? <span class="mut sm">Aap aam taur par ${t} pcs mangate hain.</span><div class="chips"><button class="chip" data-act="addn" data-id="${n.id}">Haan, jod do</button><button class="chip g" data-act="skipn" data-id="${n.id}">Is baar nahi</button></div></div>`})}});
  if(S.typing)h+='<div class="b dots"><span></span><span></span><span></span></div>';
  c.innerHTML=h;if(S.chat.length!==S.len||S.typing){c.scrollTop=c.scrollHeight;S.len=S.chat.length}else c.scrollTop=top;
- $('#sheet').hidden=!S.sheet;$('#sheet').innerHTML=S.sheet?sheetHtml():'';
+ $('#sheet').hidden=!S.sheet;$('#sheet').innerHTML=S.sheet?(S.invView&&S.invoices[S.invView]?invHtml(S.invoices[S.invView]):sheetHtml()):'';
  if(S.lines.length){S.last=JSON.stringify({store:S.store,status:'draft',items:S.lines.map(l=>({source_text:l.raw,product_id:l.item?.id??null,product:l.item?.name??null,quantity:l.qty,unit:l.unit,pieces:l.item&&l.qty!=null?pcs(l):null,flag:st(l)})),total_inr:total(S.lines)},null,1)}
  $('#json').textContent=S.last;$('#eng').textContent='Parser engine: '+S.engine}
 function dedupe(){const seen={};S.lines=S.lines.filter(l=>{if(!l.item||l.qty==null)return true;const k=l.item.id+l.unit,f=seen[k];if(f){f.qty+=l.qty;f.ack=false;f.fresh=1;return false}seen[k]=l;return true})}
@@ -319,9 +319,19 @@ async function llmEval(){const o=$('#llmres');o.textContent='Running all test me
  try{for(const[m]of TESTS)pre[m]=await apiLines(m)}catch(e){S.llmh='<p class="note">API not reachable. Deploy with ANTHROPIC_API_KEY set, then run again.</p>';o.innerHTML=S.llmh;return}
  const T=runTests(pre),pct=x=>Math.round(x*100)+'%';
  S.llmh=`<h2>Claude parser on the same tests</h2><div class="kpi"><div><b>${pct(T.c/T.n)}</b>exactly correct</div><div><b>${pct(T.ask/T.n)}</b>safe follow-up</div><div><b>${T.wrong}</b>silent wrong</div><div><b>${T.hall}</b>made-up product</div></div><div class="scroll"><table><tr><th>Message</th><th>Expected</th><th>Got</th></tr>${T.rows.filter(r=>r.v!=='ok').map(r=>`<tr><td>${esc(r.m)}</td><td>${esc(r.exp)}</td><td>${esc(r.got)}</td></tr>`).join('')||'<tr><td colspan=3>All rows correct</td></tr>'}</table></div>`;o.innerHTML=S.llmh}
-function confirmOrder(){const html=card(true),t=total(S.lines),id='KR-'+(++S.n);
+const SELLER={name:'Kirana Wholesale Distributors (demo)',gstin:'GSTIN: add real number here'};
+function invBody(v){const a=v.lines.every(l=>l.gst!=null);let tx='';
+ if(a){const tv=v.lines.reduce((s,l)=>s+l.amt/(1+l.gst/100),0),tax=v.total-tv;tx=`<tr><td colspan="4" class="r">Taxable value</td><td class="r">${fmt(tv)}</td></tr><tr><td colspan="4" class="r">CGST</td><td class="r">${fmt(tax/2)}</td></tr><tr><td colspan="4" class="r">SGST</td><td class="r">${fmt(tax/2)}</td></tr>`}
+ return `<h3 style="margin:0">${a?'Tax Invoice':'Invoice'}</h3><p style="margin:2px 0 8px"><b>${esc(SELLER.name)}</b><br>${esc(SELLER.gstin)}</p><p style="margin:0 0 8px">Invoice no: <b>${v.id}</b><br>Date: ${v.date}<br>Bill to: <b>${esc(v.store)}</b></p><table><tr><th>#</th><th>Item</th><th>Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr>${v.lines.map((l,i)=>`<tr><td>${i+1}</td><td>${esc(l.name)}</td><td>${l.qty} ${UL[l.unit]}<br><small>${l.pcs.toLocaleString('en-IN')} pcs</small></td><td class="r">${fmt(l.rate)}</td><td class="r">${fmt(l.amt)}</td></tr>`).join('')}${tx}<tr><td colspan="4" class="r"><b>Grand total</b></td><td class="r"><b>${fmt(v.total)}</b></td></tr></table><p style="font-size:12px">${a?'':'Prices are MRP-inclusive in this demo and GST is not itemised. Add a gst column to catalog.csv to show the tax split. '}Order confirmed by the shopkeeper before dispatch. Computer-generated invoice (demo).</p>`}
+const invDoc=v=>`<!doctype html><html><head><meta charset="utf-8"><title>Invoice ${v.id}</title><style>body{font:14px Arial,sans-serif;padding:24px;max-width:720px;margin:auto}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #999;padding:5px 6px;text-align:left;vertical-align:top}.r{text-align:right}</style></head><body>${invBody(v)}</body></html>`;
+const invHtml=v=>`<div>${invBody(v)}<div class="btns" style="margin-top:8px"><button class="sec" data-act="invprint">Print / PDF</button><button class="sec" data-act="invdl">Download</button><button class="sec" data-act="invwa">WhatsApp</button></div><button class="sec" data-act="back" style="width:100%">Band karein</button></div>`;
+function invText(v){return `Invoice ${v.id}\n${v.store}\n${v.date}\n`+v.lines.map((l,i)=>`${i+1}. ${l.name} - ${l.qty} ${UL[l.unit]} (${l.pcs} pcs) = ${fmt(l.amt)}`).join('\n')+`\nTotal: ${fmt(v.total)}`}
+function invPrint(){const v=S.invoices[S.invView];if(!v)return;const f=document.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';document.body.appendChild(f);f.onload=()=>{try{f.contentWindow.focus();f.contentWindow.print()}catch(e){}setTimeout(()=>f.remove(),60000)};f.srcdoc=invDoc(v)}
+function invDownload(){const v=S.invoices[S.invView];if(!v)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([invDoc(v)],{type:'text/html'}));a.download=v.id+'-invoice.html';a.click()}
+function invShare(){const v=S.invoices[S.invView];if(v)window.open('https://wa.me/?text='+encodeURIComponent(invText(v)),'_blank')}
+function confirmOrder(){const html=card(true),t=total(S.lines),id='KR-'+(++S.n);S.invoices[id]={id,date:new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}),store:P[S.store].name,total:t,lines:S.lines.map(l=>({name:l.item.name,qty:l.qty,unit:l.unit,pcs:pcs(l),rate:l.item.price,amt:pcs(l)*l.item.price,gst:l.item.gst}))};
  S.chat=S.chat.map(m=>m.t==='order'?{t:'receipt',html,time:tm()}:m);
- S.chat.push({t:'bot',text:`✅ Order <b>${id}</b> confirm ho gaya. Total ${fmt(t)}. Warehouse ko bhej diya gaya hai, kal subah tak delivery. Naya order likhne ke liye bas message bhejein.`,time:tm()});
+ S.chat.push({t:'bot',text:`✅ Order <b>${id}</b> confirm ho gaya. Total ${fmt(t)}. Warehouse ko bhej diya gaya hai, kal subah tak delivery. Naya order likhne ke liye bas message bhejein.<div class="chips"><button class="chip" data-act="inv" data-id="${id}">📄 Invoice dekhein</button></div>`,time:tm()});
  S.lines=[];S.sheet=false;render()}
 $('.phone').addEventListener('click',e=>{const b=e.target.closest('button[data-act]');if(!b)return;const a=b.dataset.act,i=+b.dataset.i,l=S.lines[i];
  if(a==='pick'){l.item=byId[b.dataset.id];l.options=null;dedupe()}
@@ -335,7 +345,11 @@ $('.phone').addEventListener('click',e=>{const b=e.target.closest('button[data-a
  else if(a==='addn'){const id=b.dataset.id;S.lines.push({raw:'(reminder)',qty:Math.max(1,Math.round(typ(S.store,id)/byId[id].case)),unit:byId[id].tin?'tin':'case',item:byId[id],options:null,missing:false,ack:true})}
  else if(a==='skipn')S.skip[S.store+b.dataset.id]=1;
  else if(a==='review')S.sheet=true;
- else if(a==='back')S.sheet=false;
+ else if(a==='back'){S.sheet=false;S.invView=null}
+ else if(a==='inv'){S.invView=b.dataset.id;S.sheet=true}
+ else if(a==='invprint')invPrint();
+ else if(a==='invdl')invDownload();
+ else if(a==='invwa')invShare();
  else if(a==='brand'){const p=l.p;p.words=[...p.words,...tk(b.dataset.b)];const f=l.fresh;Object.assign(l,{brands:null,options:null,item:null,missing:false,sugg:null},resolve(p),{fresh:f});dedupe()}
  else if(a==='newo'){S.lines=[];S.sheet=false;S.chat=S.chat.filter(m=>m.t!=='order');S.chat.push({t:'bot',text:'Draft hata diya 🗑 Naya order likhiye.',time:tm()})}
  else if(a==='confirm')return confirmOrder();
