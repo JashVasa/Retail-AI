@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kirana Order Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--pg:#dfe5e8;--hd:#0b5c52;--hdt:#fff;--chat:#e9e4db;--bot:#fff;--me:#d9fdd3;--ink:#111b21;--mut:#667781;--line:#d8dde0;--ok:#1a7f4b;--okbg:#e1f5e8;--askbg:#e7f0fb;--warnbg:#fff1cc;--warn:#7a4f00;--errbg:#fde8e6;--red:#b3261e;--gold:#f2b01e;--goldt:#2a1d00;--inp:#fff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--pg:#0a1014;--hd:#1f2c33;--hdt:#e9edef;--chat:#0b141a;--bot:#202c33;--me:#005c4b;--ink:#e9edef;--mut:#8696a0;--line:#2f3b43;--ok:#74d49b;--okbg:#14352c;--askbg:#1b2d44;--warnbg:#3a2e0f;--warn:#ffd27a;--errbg:#3d1c1a;--red:#ff8a80;--inp:#2a3942;color-scheme:dark}}
+:root[data-theme="dark"]{--pg:#0a1014;--hd:#1f2c33;--hdt:#e9edef;--chat:#0b141a;--bot:#202c33;--me:#005c4b;--ink:#e9edef;--mut:#8696a0;--line:#2f3b43;--ok:#74d49b;--okbg:#14352c;--askbg:#1b2d44;--warnbg:#3a2e0f;--warn:#ffd27a;--errbg:#3d1c1a;--red:#ff8a80;--inp:#2a3942;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--pg);color:var(--ink);font:400 16px/1.45 Mukta,system-ui,sans-serif}
+.wrap{max-width:1020px;margin:0 auto;padding:14px;display:grid;grid-template-columns:400px minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:860px){.wrap{grid-template-columns:1fr;justify-items:center}.panel{width:100%}}
+.phone{width:100%;max-width:400px;height:min(740px,calc(100dvh - 28px));min-height:560px;display:flex;flex-direction:column;border-radius:22px;overflow:hidden;border:1px solid var(--line);position:relative;background:var(--chat);box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.hd{background:var(--hd);color:var(--hdt);padding:10px 14px;display:flex;gap:10px;align-items:center}
+.hd b{display:block;line-height:1.2}.hd small{opacity:.8}
+.av{width:38px;height:38px;border-radius:50%;background:var(--gold);color:var(--goldt);display:grid;place-items:center;font-weight:800}
+#chat{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.b{max-width:88%;padding:8px 10px;border-radius:10px;background:var(--bot);color:var(--ink);box-shadow:0 1px 1px rgba(0,0,0,.15);overflow-wrap:anywhere}
+.b.me{align-self:flex-end;background:var(--me);white-space:pre-wrap}.b.wide{max-width:100%}
+.b time{display:block;text-align:right;font-size:11px;color:var(--mut)}
+.dots{display:flex;gap:4px;padding:12px}.dots span{width:7px;height:7px;border-radius:50%;background:var(--mut);animation:bl 1s infinite}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes bl{50%{opacity:.25}}@media(prefers-reduced-motion:reduce){.dots span{animation:none}}
+button{font:inherit;cursor:pointer;color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.ch{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+.mut{color:var(--mut)}.sm{font-size:13px}
+.ln{padding:8px 0;border-top:1px solid var(--line)}
+.r1{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.r2{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.raw{color:var(--mut);font-size:13px;font-style:italic;flex:1;min-width:90px}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:99px}
+.step button{width:38px;height:38px;border:0;background:none;font-size:20px}.step span{min-width:76px;text-align:center;font-size:14px}
+.x{border:0;background:none;color:var(--mut);font-size:16px;width:34px;height:34px}
+.ask{background:var(--askbg);border-radius:8px;padding:8px;margin-top:6px}.ask.w{background:var(--warnbg);color:var(--warn)}.ask.e{background:var(--errbg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{border:1px solid var(--ok);color:var(--ok);background:var(--bot);border-radius:99px;padding:8px 12px;font-weight:600;min-height:40px}
+.chip.g{border-color:var(--line);color:var(--mut)}
+.tot{display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--ink);margin-top:6px;padding-top:6px;font-size:20px}
+.cta{width:100%;margin-top:8px;min-height:46px;border:0;border-radius:8px;background:var(--gold);color:var(--goldt);font-weight:800;font-size:16px}
+.cta:disabled{opacity:.5;cursor:not-allowed}
+.sec{min-height:46px;border:1px solid var(--line);border-radius:8px;background:var(--bot);padding:0 14px;margin-top:8px}
+.nudge b{display:inline}.tag{font-style:normal;font-size:12px;background:var(--okbg);color:var(--ok);border-radius:99px;padding:0 8px;margin-right:6px}
+.cm{display:flex;gap:8px;padding:8px;background:var(--chat)}
+.cm input{flex:1;min-width:0;border:0;border-radius:99px;padding:10px 14px;background:var(--inp);color:var(--ink);font:inherit}
+.snd{width:44px;height:44px;border-radius:50%;border:0;background:var(--hd);color:var(--hdt);font-size:18px}
+#sheet{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end}#sheet[hidden]{display:none}
+#sheet>div{background:var(--bot);width:100%;border-radius:18px 18px 0 0;padding:16px;max-height:92%;overflow:auto}
+#sheet h3{margin:0 0 6px}#sheet .btns{display:flex;gap:8px}#sheet .btns button{flex:1}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
+.panel>div,.ev{background:var(--bot);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.panel h2,.ev h2{font-size:18px;margin:0 0 6px}
+.panel select{font:inherit;width:100%;padding:6px;border-radius:6px;border:1px solid var(--line);background:var(--inp);color:var(--ink)}
+.sc{display:grid;gap:6px;margin-top:8px}.sc button{text-align:left;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--inp)}.sc small{display:block;color:var(--mut)}
+pre{background:var(--inp);padding:8px;border-radius:6px;overflow:auto;font-size:12px;max-height:260px}
+.note{font-size:14px;color:var(--mut)}.scroll{overflow-x:auto}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+input.q{width:70px;font:inherit;padding:4px;background:var(--inp);color:var(--ink);border:1px solid var(--line);border-radius:6px}
+.pill{padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600}.c-ok{background:var(--okbg);color:var(--ok)}.c-ask{background:var(--askbg)}.c-bad{background:var(--errbg);color:var(--red)}
+.kpi{display:flex;gap:10px;flex-wrap:wrap}.kpi div{flex:1;min-width:120px;background:var(--inp);border-radius:8px;padding:8px}.kpi b{font-size:20px;display:block}
+summary{cursor:pointer;font-weight:600}
+.full{grid-column:1/-1}
+</style></head><body>
+<div class="wrap">
+<div class="phone">
+ <div class="hd"><div class="av">K</div><div><b id="sn">Store</b><small>Kirana Order Assistant · online</small></div></div>
+ <div id="chat" aria-live="polite"></div>
+ <div class="cm"><input id="in" placeholder="Order likhiye, jaise 2 peti maggi" aria-label="Message"><button class="snd" id="go" aria-label="Bhejein">➤</button></div>
+ <div id="sheet" hidden></div>
+</div>
+<div class="panel">
+ <div><h2>Demo controls</h2><p class="note">Left is exactly what the shopkeeper sees. These controls are for the presenter only.</p>
+ <label class="note" for="store">Store</label><select id="store"></select>
+ <div class="sc" id="sc"></div><div class="row"><button class="sec" id="reset" style="margin:0">Chat reset karein</button></div>
+ <p class="note" id="eng"></p><p class="note">Nothing is really sent anywhere. Confirm only simulates dispatch.</p></div>
+ <div><details><summary>Structured order (JSON the LLM step produces)</summary><pre id="json">–</pre></details></div>
+</div>
+<div class="ev full"><details><summary>Evaluation: parser accuracy and nudge model vs baseline (live)</summary><div id="ev"></div></details></div>
+</div>
+<script>
+
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const C=[['oil1','Fortune Sunflower Oil 1L pouch',['fortune'],['oil','tel','sunflower','refined'],'1l',135,12],
+['oil5','Fortune Sunflower Oil 5L tin',['fortune'],['oil','tel','sunflower','refined'],'5l',690,4,1],
+['saf','Saffola Gold Oil 1L',['saffola'],['oil','tel'],'1l',185,12],
+['sar','Dhara Kachi Ghani Mustard Oil 1L',['dhara'],['oil','tel','sarson','mustard','kachi','ghani'],'1l',165,12],
+['salt','Tata Salt 1kg',['tata'],['salt','namak'],'1kg',28,25],
+['tea','Tata Tea Red Label 250g',['tata','red','label'],['tea','chai','patti'],'250g',135,24],
+['atta5','Aashirvaad Atta 5kg',['aashirvaad','ashirvad','aashirwad','ashirwad'],['atta','aata'],'5kg',265,4],
+['atta10','Aashirvaad Atta 10kg',['aashirvaad','ashirvad','aashirwad','ashirwad'],['atta','aata'],'10kg',520,2],
+['maggi','Maggi 2-Minute Noodles 70g',['maggi'],['noodles'],'70g',14,48],
+['parle','Parle-G Biscuit 56g',['parle','g'],['biscuit'],'56g',5,120],
+['goodday','Britannia Good Day Cookies 100g',['good','day','britannia'],['biscuit','cookies'],'100g',10,72],
+['surf1','Surf Excel Easy Wash 1kg',['surf','excel'],['detergent','powder'],'1kg',130,12],
+['surf5','Surf Excel Easy Wash 500g',['surf','excel'],['detergent','powder'],'500g',68,24],
+['colgate','Colgate Strong Teeth 200g',['colgate'],['paste','toothpaste'],'200g',110,48],
+['lifebuoy','Lifebuoy Total Soap 100g',['lifebuoy'],['soap','sabun'],'100g',32,72],
+['butter100','Amul Butter 100g',['amul'],['butter','makhan'],'100g',58,40],
+['butter500','Amul Butter 500g',['amul'],['butter','makhan'],'500g',285,20],
+['sugar','Sugar 5kg bag',[],['sugar','chini','cheeni'],'5kg',230,6],
+['toor','Toor Dal 1kg',[],['toor','dal','tuvar','arhar'],'1kg',165,10]].map(a=>({id:a[0],name:a[1],B:a[2],F:a[3],size:a[4],price:a[5],case:a[6],tin:!!a[7]}));
+const byId=Object.fromEntries(C.map(c=>[c.id,c]));
+function lev(a,b){const m=[];for(let i=0;i<=a.length;i++)m[i]=[i];for(let j=1;j<=b.length;j++)m[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]==b[j-1]?0:1));return m[a.length][b.length]}
+const hit=(q,w)=>q==w||(q.length>=4&&w.length>=4&&lev(q,w)<=(q.length>=7?2:1));
+const NW={ek:1,do:2,teen:3,char:4,chaar:4,paanch:5,panch:5,chhe:6,saat:7,aath:8,nau:9,das:10,bees:20,aadha:.5,half:.5};
+const U={peti:'case',petti:'case',carton:'case',case:'case',box:'case',dabba:'tin',dabbe:'tin',tin:'tin',jar:'tin',packet:'pcs',packets:'pcs',pkt:'pcs',pack:'pcs',pc:'pcs',pcs:'pcs',piece:'pcs',bag:'pcs',bori:'pcs',nos:'pcs',dozen:'dozen',darjan:'dozen',dzn:'dozen',kg:'kg',kilo:'kg',g:'g',gm:'g',gram:'g',l:'l',ltr:'l',litre:'l',liter:'l'};
+const STOP=new Set('bhaiya bhai bhej bhejna dena de dijiye chahiye please pls ka ki ke ko wala wali wale hai hello namaste mujhe order kal tak the for sir ji aap hi bas'.split(' '));
+function parseSeg(raw){
+ const t=raw.toLowerCase().replace(/[-_]|\.(?!\d)/g,' ').replace(/(\d)([a-z])/g,'$1 $2').split(/\s+/).filter(w=>w&&!STOP.has(w));
+ let qty=null,unit=null,size=null,words=[];
+ for(let i=0;i<t.length;i++){const w=t[i],nx=t[i+1];let n=null;
+  if(/^\d+(\.\d+)?$/.test(w))n=+w;else if(NW[w]!==undefined&&(i==0||U[nx]))n=NW[w];
+  if(n!==null){const u=U[nx];
+   if(u&&['kg','g','l'].includes(u)){size={n,u};i++;continue}
+   if(u){if(qty===null){qty=n;unit=u}i++;continue}
+   if(qty===null){qty=n;unit='pcs'}continue}
+  if(NW[w]!==undefined)continue;
+  if(U[w]&&w.length>1)continue;
+  words.push(w)}
+ return{raw:raw.trim(),qty,unit,size,words}}
+function resolve(p){
+ const sc=C.map(it=>{let w=0,un=0,b=false;for(const q of p.words){if(it.B.some(x=>hit(q,x))){w+=2;b=true}else if(it.F.some(x=>hit(q,x)))w+=1;else un++}
+  let s=w;if(w>0){if(p.size&&''+p.size.n+p.size.u===it.size)s+=1.5;if(p.unit==='tin'&&it.tin)s+=1.5}return{it,w,s,un,b}}).filter(x=>x.w>0).sort((a,b)=>b.s-a.s);
+ const l={raw:p.raw,qty:p.qty,unit:p.unit||'pcs',item:null,options:null,missing:false,sugg:null,ack:false};
+ if(!sc.length){l.missing=true;return l}
+ const top=sc[0],tied=sc.filter(x=>x.s>=top.s-.01);
+ if(!tied.some(x=>x.b)&&top.un>0){l.missing=true;l.sugg=top.it;return l}
+ if(tied.length===1)l.item=top.it;else l.options=tied.slice(0,4).map(x=>x.it);
+ return l}
+const pcs=l=>l.qty==null?0:Math.round(l.unit==='case'?l.qty*l.item.case:l.unit==='dozen'?l.qty*12:l.qty);
+function splitMsg(m){return m.toLowerCase().split(/\s*(?:[,;\n+]|\baur\b|\band\b|\bphir\b)\s*/).filter(x=>x.trim())}
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const P={sharma:{name:'Sharma General Store, Kalyan West',h:{oil1:[.9,36],maggi:[.75,96],parle:[.7,120],salt:[.6,50],tea:[.5,12],colgate:[.3,48],atta5:[.35,8]}},
+patil:{name:'Patil Kirana, Dombivli',h:{sar:[.85,24],atta10:[.8,4],sugar:[.7,12],toor:[.6,20],tea:[.6,12],lifebuoy:[.5,72],butter100:[.3,40]}},
+fatima:{name:'Fatima Provision, Bhiwandi',h:{oil5:[.6,4],saf:[.4,12],maggi:[.8,96],surf1:[.6,24],goodday:[.5,72],colgate:[.5,48],lifebuoy:[.5,72]}}};
+let seed=7;for(const k in P){const r=rng(seed+=101);P[k].orders=Array.from({length:36},()=>{const o={};for(const id in P[k].h){const[p,t]=P[k].h[id];if(r()<p)o[id]=Math.round(t*(.75+.5*r()))}return o})}
+function ewma(k,id,upto){let s=.5;for(let i=0;i<upto;i++)s=.3*(P[k].orders[i][id]?1:0)+.7*s;return s}
+const typ=(k,id)=>{const v=P[k].orders.map(o=>o[id]).filter(Boolean);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):0};
+function nudgeEval(th){const r={m:{tp:0,fp:0,fn:0,tn:0},b:{tp:0,fp:0,fn:0,tn:0}};
+ for(const k in P)for(let t=26;t<36;t++)for(const id in P[k].h){const a=!!P[k].orders[t][id];
+  for(const[n,pred]of[['m',ewma(k,id,t)>=th],['b',!!P[k].orders[t-1][id]]])r[n][a?(pred?'tp':'fn'):(pred?'fp':'tn')]++}return r}
+const TESTS=[['2 peti maggi',[['maggi',96]]],['1 peti parle g aur 3 pkt red label',[['parle',120],['tea',3]]],['5 packet tata salt',[['salt',5]]],['3 peti fortune oil 1l',[['oil1',36]]],['ek dabba fortune tel',[['oil5',1]]],['2 peti surf',['ASK']],['tel 2 peti',['ASK']],['aashirwad atta 10kg 2 bag',[['atta10',2]]],['2 peti dove soap',['NONE']],['nutella 3 jar',['NONE']],['do peti maggi aur ek peti colgate',[['maggi',96],['colgate',48]]],['mggi 1 peti',[['maggi',48]]],['paanch dozen amul butter 100g',[['butter100',60]]],['butter 2 peti',['ASK']],['10 peti parle g',[['parle',1200]]],['aadha peti maggi',[['maggi',24]]],['2 peti lifebuoy sabun',[['lifebuoy',144]]],['Parle G ka ek carton',[['parle',120]]],['bhaiya 2 peti kinley water bhej do',['NONE']],['3 peti dhara kachi ghani',[['sar',36]]],['saffola gold 2 peti',[['saf',24]]],['1 peti maggi ya 2 peti parle g',['ASK']],['5 peti parle (nahi 1 peti)',[['parle',120]]]];
+function runTests(pre){const o=[];let c=0,ask=0,wrong=0,hall=0,n=0;
+ for(const[m,g]of TESTS){const ls=pre?pre[m]:splitMsg(m).map(s=>resolve(parseSeg(s)));
+  g.forEach((gold,i)=>{const l=ls[i];n++;let v,got;
+   if(!l){v='wrong';got='(no line)'}
+   else if(l.missing){got='not in catalog';v=gold==='NONE'?'ok':gold==='ASK'?'wrong':'ask'}
+   else if(!l.item||l.qty==null){got='follow-up asked';v=gold==='ASK'?'ok':gold==='NONE'?'ok':'ask'}
+   else{got=l.item.id+' ×'+pcs(l);v=gold==='NONE'?'hall':gold==='ASK'?'wrong':(gold[0]===l.item.id&&gold[1]===pcs(l)?'ok':'wrong')}
+   if(v==='ok')c++;else if(v==='ask')ask++;else if(v==='hall')hall++;else wrong++;
+   o.push({m,exp:gold==='ASK'?'follow-up':gold==='NONE'?'not in catalog':gold[0]+' ×'+gold[1],got,v})})}
+ return{rows:o,c,ask,wrong,hall,n}}
+function evalHtml(){const T=runTests(),pct=x=>Math.round(x*100)+'%';
+ const E=nudgeEval(S.th),pr=r=>({p:r.tp/(r.tp+r.fp||1),r:r.tp/(r.tp+r.fn||1),cost:r.fp*S.cFP+r.fn*S.cFN});
+ const m=pr(E.m),b=pr(E.b);
+ return `<div class="row"><button class="sec" id="llmbtn" style="margin:0">Run the same tests with Claude (needs deployed API key)</button></div><div id="llmres"></div><h2>1. Parser (${T.n} labelled lines)</h2><div class="kpi"><div><b>${pct(T.c/T.n)}</b>exactly correct</div><div><b>${pct(T.ask/T.n)}</b>safe follow-up / not-in-catalog</div><div><b>${T.wrong}</b>silent wrong item or qty</div><div><b>${T.hall}</b>made-up product</div></div>
+ <div class="scroll"><table><tr><th>Message line</th><th>Expected</th><th>Got</th><th>Result</th></tr>${T.rows.map(r=>`<tr><td>${esc(r.m)}</td><td>${esc(r.exp)}</td><td>${esc(r.got)}</td><td><span class="pill ${r.v==='ok'?'c-ok':r.v==='ask'?'c-ask':'c-bad'}">${{ok:'correct',ask:'asked (safe)',wrong:'WRONG',hall:'HALLUCINATED'}[r.v]}</span></td></tr>`).join('')}</table></div>
+ <p class="note">Rows marked asked are not errors but cost the shopkeeper a tap. Silent wrong rows are the dangerous ones, which is why the confirmation step exists.</p>
+ <h2 style="margin-top:14px">2. Reorder nudge model vs baseline</h2>
+ <p class="note">Model: exponentially weighted share of past orders containing the item. Baseline: “item was in the last order”. Test: 210 item decisions across 3 stores.</p>
+ <div class="row"><label>Nudge threshold <b id="thv">${S.th}</b></label><input type="range" id="th" min=".3" max=".9" step=".05" value="${S.th}" style="max-width:220px">
+ <label>Cost of a missed item ₹</label><input class="q" type="number" id="cfn" value="${S.cFN}"><label>Cost of a useless nudge ₹</label><input class="q" type="number" id="cfp" value="${S.cFP}"></div>
+ <div class="scroll"><table><tr><th></th><th>Precision</th><th>Recall</th><th>Cost on test set</th></tr><tr><td>Baseline (last order)</td><td>${pct(b.p)}</td><td>${pct(b.r)}</td><td>${fmt(b.cost)}</td></tr><tr><td><b>Model (EWMA ≥ ${S.th})</b></td><td>${pct(m.p)}</td><td>${pct(m.r)}</td><td>${fmt(m.cost)}</td></tr></table></div>
+ <p class="note">Costs are assumptions: a missed item means a lost sale or an extra delivery trip; a useless nudge costs a little attention and, if frequent, trust. History is <b>synthetic</b> and generated from fixed habits, so the model partly learns the generator. Real data would show lower scores. Replace before going live.</p>`}
+function bindEv(){$('#ev').innerHTML=evalHtml();$('#llmbtn').onclick=llmEval;$('#llmres').innerHTML=S.llmh||'';$('#th').oninput=e=>{S.th=+e.target.value;bindEv();render()};$('#cfn').onchange=e=>{S.cFN=+e.target.value;bindEv()};$('#cfp').onchange=e=>{S.cFP=+e.target.value;bindEv()}}
+const S={store:'sharma',lines:[],skip:{},chat:[],typing:false,sheet:false,th:.55,cFP:5,cFN:150,n:1041,last:'–',len:0,engine:'not used yet',llmh:''};
+const tm=()=>new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+const UL={case:'peti',pcs:'pcs',dozen:'dozen',tin:'dabba'};
+const SC=[['Clean order','sharma','Sab items samajh aate hain','2 peti maggi, 1 peti parle g, 3 peti fortune oil 1l, 1 peti tata salt, 2 pkt red label'],['Needs a follow-up','sharma','Do cheezon mein size poochta hai','bhaiya 2 peti fortune tel aur surf 3 packet bhej do'],['Reorder nudge','sharma','Usual item missing hai','2 peti maggi aur 1 peti parle g aur 5 pkt red label'],['Edge cases','sharma','Catalog mein nahi + bahut bada quantity','1 peti maggi, 2 peti dove soap, 50 peti parle g, nutella 3 jar']];
+function sane(l){if(!l.item||l.qty==null)return null;const p=pcs(l),t=typ(S.store,l.item.id),lim=t?t*3:l.item.case*5;
+ return p>lim?`${l.qty} ${UL[l.unit]} = ${p.toLocaleString('en-IN')} pcs (${fmt(p*l.item.price)}). ${t?'Aap aam taur par '+t+' pcs mangate hain.':'Yeh bahut zyada lagta hai.'} Kya yeh sahi hai?`:null}
+const st=l=>l.missing?'missing':!l.item?'variant':l.qty==null?'qty':(sane(l)&&!l.ack)?'warn':'ok';
+function nudges(){const k=S.store,have=new Set();S.lines.forEach(l=>{if(l.item)have.add(l.item.id);(l.options||[]).forEach(o=>have.add(o.id));if(l.sugg)have.add(l.sugg.id)});
+ return Object.keys(P[k].h).filter(id=>!have.has(id)&&!S.skip[k+id]).map(id=>({id,s:ewma(k,id,36)})).filter(x=>x.s>=S.th).sort((a,b)=>b.s-a.s).slice(0,2)}
+const total=ls=>ls.reduce((a,l)=>a+(l.item&&l.qty!=null?pcs(l)*l.item.price:0),0);
+function card(ro,ls){ls=ls||S.lines;
+ let h=`<div class="ch"><b>${ro?'✅ Confirmed order':'Aapka order'}</b><span class="mut sm">${ls.length} item</span></div>`;
+ ls.forEach((l,i)=>{
+  if(l.item){const ok=l.qty!=null,a=ok?pcs(l)*l.item.price:0,sn=ro?null:sane(l),u=UL[l.item.tin?'tin':'case'];
+   h+=`<div class="ln"><div class="r1"><span>${l.fresh&&!ro&&ls.some(x=>!x.fresh)?'<i class="tag">naya</i>':''}${esc(l.item.name)}</span><span>${ok?fmt(a):'–'}</span></div><div class="r2"><span class="raw">${l.raw.startsWith('(')?'reminder se joda':'“'+esc(l.raw)+'”'}</span>`;
+   if(ok&&!ro)h+=`<span class="step"><button data-act="qdec" data-i="${i}" aria-label="Kam karein">−</button><span>${l.qty} ${UL[l.unit]}</span><button data-act="qinc" data-i="${i}" aria-label="Badhayein">+</button></span>`;
+   if(ok&&ro)h+=`<span>${l.qty} ${UL[l.unit]}</span>`;
+   if(!ro)h+=`<button class="x" data-act="rm" data-i="${i}" aria-label="Hatao">✕</button>`;
+   h+='</div>';
+   if(ok)h+=`<div class="mut sm">${pcs(l).toLocaleString('en-IN')} pcs × ${fmt(l.item.price)}</div>`;
+   if(!ok&&!ro)h+=`<div class="ask">Kitna chahiye?<div class="chips">${[1,2,5,10].map(v=>`<button class="chip" data-act="qset" data-i="${i}" data-v="${v}">${v} ${u}</button>`).join('')}</div></div>`;
+   if(sn&&!l.ack){const t=typ(S.store,l.item.id),fq=t?Math.max(1,Math.round(t/(l.unit==='case'?l.item.case:1))):1;
+    h+=`<div class="ask w">⚠ ${esc(sn)}<div class="chips"><button class="chip" data-act="ack" data-i="${i}">Haan, sahi hai</button><button class="chip" data-act="fix" data-i="${i}" data-v="${fq}">${fq} ${UL[l.unit]} kar do</button></div></div>`}
+   h+='</div>'}
+  else if(l.missing){h+=`<div class="ln"><div class="r1"><span>“${esc(l.raw)}”</span></div><div class="ask e">❌ Yeh item hamare catalog mein nahi hai, isliye order mein nahi joda.${l.sugg?` <b>${esc(l.sugg.name)}</b> chalega?`:''}<div class="chips">${l.sugg?`<button class="chip" data-act="sugg" data-i="${i}">Haan, yeh lagao</button>`:''}<button class="chip g" data-act="rm" data-i="${i}">Rehne do</button></div></div></div>`}
+  else h+=`<div class="ln"><div class="r1"><span>“${esc(l.raw)}”</span></div><div class="ask">Kaun sa lena hai?<div class="chips">${l.options.map(o=>`<button class="chip" data-act="pick" data-i="${i}" data-id="${o.id}">${esc(o.name)} · ${fmt(o.price)}</button>`).join('')}</div></div></div>`});
+ const t=total(ls);h+=`<div class="tot"><span>Total</span><b>${fmt(t)}</b></div>`;
+ if(!ro){const p=ls.filter(l=>st(l)!=='ok').length;h+=`<button class="cta" data-act="review" ${p||!t?'disabled':''}>${p?`Pehle ${p} sawal ka jawab dein`:`Order check karein · ${fmt(t)}`}</button><button class="sec" data-act="newo" style="width:100%">Naya order shuru karein</button>`}
+ return h}
+function sheetHtml(){const rows=S.lines.map(l=>`<tr><td>${esc(l.item.name)}</td><td>${l.qty} ${UL[l.unit]}</td><td>${fmt(pcs(l)*l.item.price)}</td></tr>`).join('');
+ return `<div><h3>Bhejne se pehle check kar lein</h3><table>${rows}</table><div class="tot"><span>Total</span><b>${fmt(total(S.lines))}</b></div><p class="mut sm">Aapke “Haan” dabane ke baad hi order warehouse ko jaata hai. Uske pehle kuch nahi bhejta.</p><div class="btns"><button class="sec" data-act="back">Wapas</button><button class="cta" data-act="confirm">Haan, order bhej do</button></div></div>`}
+function render(){const c=$('#chat'),top=c.scrollTop;let h='';
+ S.chat.forEach(m=>{
+  if(m.t==='bot')h+=`<div class="b">${m.text}<time>${m.time}</time></div>`;
+  else if(m.t==='user')h+=`<div class="b me">${esc(m.text)}<time>${m.time} ✓✓</time></div>`;
+  else if(m.t==='receipt')h+=`<div class="b wide">${m.html}<time>${m.time}</time></div>`;
+  else if(m.t==='order'){h+=`<div class="b wide">${card(false)}</div>`;
+   nudges().forEach(n=>{const it=byId[n.id],t=typ(S.store,n.id);h+=`<div class="b nudge">💡 Aapne is baar <b>${esc(it.name)}</b> order nahi kiya, bhej dein? <span class="mut sm">Aap aam taur par ${t} pcs mangate hain.</span><div class="chips"><button class="chip" data-act="addn" data-id="${n.id}">Haan, jod do</button><button class="chip g" data-act="skipn" data-id="${n.id}">Is baar nahi</button></div></div>`})}});
+ if(S.typing)h+='<div class="b dots"><span></span><span></span><span></span></div>';
+ c.innerHTML=h;if(S.chat.length!==S.len||S.typing){c.scrollTop=c.scrollHeight;S.len=S.chat.length}else c.scrollTop=top;
+ $('#sheet').hidden=!S.sheet;$('#sheet').innerHTML=S.sheet?sheetHtml():'';
+ if(S.lines.length){S.last=JSON.stringify({store:S.store,status:'draft',items:S.lines.map(l=>({source_text:l.raw,product_id:l.item?.id??null,product:l.item?.name??null,quantity:l.qty,unit:l.unit,pieces:l.item&&l.qty!=null?pcs(l):null,flag:st(l)})),total_inr:total(S.lines)},null,1)}
+ $('#json').textContent=S.last;$('#eng').textContent='Parser engine: '+S.engine}
+function dedupe(){const seen={};S.lines=S.lines.filter(l=>{if(!l.item||l.qty==null)return true;const k=l.item.id+l.unit,f=seen[k];if(f){f.qty+=l.qty;f.ack=false;f.fresh=1;return false}seen[k]=l;return true})}
+function greet(){S.lines=[];S.sheet=false;S.typing=false;S.skip={};S.len=0;$('#sn').textContent=P[S.store].name;
+ S.chat=[{t:'bot',text:`Namaste ${esc(P[S.store].name.split(' ')[0])} ji 🙏 Apna order waise hi likhiye jaise WhatsApp par likhte hain. Jaise: “2 peti maggi, 1 peti parle g”.`,time:tm()}];render()}
+async function apiLines(text){const r=await fetch('/api/parse',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:text})});if(!r.ok)throw new Error('api '+r.status);const j=await r.json();if(!Array.isArray(j.lines))throw new Error('bad');
+ return j.lines.map(x=>{let qty=x.qty,size=x.size||null,unit=x.unit;if(['kg','g','l'].includes(unit)){if(!size)size={n:qty,u:unit};qty=null;unit=null}
+  return resolve({raw:x.text||x.product,qty,unit,size,words:String(x.product).toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w=>w&&!STOP.has(w)&&!/^\d+$/.test(w))})})}
+async function getLines(text){try{const l=await apiLines(text);if(!l.length)throw 0;S.engine='Claude (LLM) + catalog matcher';return l}catch(e){S.engine='rule-based fallback (no API)';return splitMsg(text).map(s=>resolve(parseSeg(s)))}}
+async function send(text){text=(text||'').trim();if(!text||S.typing)return;
+ S.chat=S.chat.filter(m=>m.t!=='order');S.chat.push({t:'user',text,time:tm()});S.typing=true;render();
+ const nl=await getLines(text);S.lines.forEach(l=>l.fresh=0);nl.forEach(l=>l.fresh=1);
+ const b4=S.lines.length+nl.length;S.lines.push(...nl);dedupe();const mg=b4-S.lines.length,nw=nl.length-mg;
+ const parts=(nw?nw+' item jod diye. ':'')+(mg?mg+' item pehle se order mein tha, uski quantity badha di. ':'');
+ S.typing=false;const p=S.lines.filter(l=>st(l)!=='ok').length;
+ S.chat.push({t:'bot',text:'Order padh liya ✅ '+parts+(p?`Par ${p} cheez ke baare mein aapse poochna hai 👇`:'Sab theek ho to check karke confirm karein.'),time:tm()});
+ S.chat.push({t:'order'});render()}
+async function llmEval(){const o=$('#llmres');o.textContent='Running all test messages through Claude…';const pre={};
+ try{for(const[m]of TESTS)pre[m]=await apiLines(m)}catch(e){S.llmh='<p class="note">API not reachable. Deploy with ANTHROPIC_API_KEY set, then run again.</p>';o.innerHTML=S.llmh;return}
+ const T=runTests(pre),pct=x=>Math.round(x*100)+'%';
+ S.llmh=`<h2>Claude parser on the same tests</h2><div class="kpi"><div><b>${pct(T.c/T.n)}</b>exactly correct</div><div><b>${pct(T.ask/T.n)}</b>safe follow-up</div><div><b>${T.wrong}</b>silent wrong</div><div><b>${T.hall}</b>made-up product</div></div><div class="scroll"><table><tr><th>Message</th><th>Expected</th><th>Got</th></tr>${T.rows.filter(r=>r.v!=='ok').map(r=>`<tr><td>${esc(r.m)}</td><td>${esc(r.exp)}</td><td>${esc(r.got)}</td></tr>`).join('')||'<tr><td colspan=3>All rows correct</td></tr>'}</table></div>`;o.innerHTML=S.llmh}
+function confirmOrder(){const html=card(true),t=total(S.lines),id='KR-'+(++S.n);
+ S.chat=S.chat.map(m=>m.t==='order'?{t:'receipt',html,time:tm()}:m);
+ S.chat.push({t:'bot',text:`✅ Order <b>${id}</b> confirm ho gaya. Total ${fmt(t)}. Warehouse ko bhej diya gaya hai, kal subah tak delivery. Naya order likhne ke liye bas message bhejein.`,time:tm()});
+ S.lines=[];S.sheet=false;render()}
+$('.phone').addEventListener('click',e=>{const b=e.target.closest('button[data-act]');if(!b)return;const a=b.dataset.act,i=+b.dataset.i,l=S.lines[i];
+ if(a==='pick'){l.item=byId[b.dataset.id];l.options=null;dedupe()}
+ else if(a==='sugg'){l.item=l.sugg;l.missing=false;l.sugg=null;dedupe()}
+ else if(a==='rm')S.lines.splice(i,1);
+ else if(a==='ack')l.ack=true;
+ else if(a==='qset'){l.qty=+b.dataset.v;l.unit=l.item.tin?'tin':'case';dedupe()}
+ else if(a==='fix'){l.qty=+b.dataset.v;l.ack=false}
+ else if(a==='qinc'){l.qty+=1;l.ack=false}
+ else if(a==='qdec'){l.qty=Math.max(1,l.qty-1);l.ack=false}
+ else if(a==='addn'){const id=b.dataset.id;S.lines.push({raw:'(reminder)',qty:Math.max(1,Math.round(typ(S.store,id)/byId[id].case)),unit:byId[id].tin?'tin':'case',item:byId[id],options:null,missing:false,ack:true})}
+ else if(a==='skipn')S.skip[S.store+b.dataset.id]=1;
+ else if(a==='review')S.sheet=true;
+ else if(a==='back')S.sheet=false;
+ else if(a==='newo'){S.lines=[];S.sheet=false;S.chat=S.chat.filter(m=>m.t!=='order');S.chat.push({t:'bot',text:'Draft hata diya 🗑 Naya order likhiye.',time:tm()})}
+ else if(a==='confirm')return confirmOrder();
+ render()});
+$('#go').onclick=()=>{send($('#in').value);$('#in').value=''};
+$('#in').onkeydown=e=>{if(e.key==='Enter'){send($('#in').value);$('#in').value=''}};
+$('#store').innerHTML=Object.keys(P).map(k=>`<option value="${k}">${esc(P[k].name)}</option>`).join('');
+$('#store').onchange=e=>{S.store=e.target.value;greet()};
+$('#sc').innerHTML=SC.map((s,i)=>`<button data-sc="${i}">${s[0]}<small>${s[2]}</small></button>`).join('');
+$('#sc').onclick=e=>{const b=e.target.closest('button');if(!b)return;const s=SC[b.dataset.sc];S.store=s[1];$('#store').value=s[1];greet();send(s[3])};
+$('#reset').onclick=greet;
+bindEv();greet();
+</script></body></html>
